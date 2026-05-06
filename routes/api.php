@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
@@ -14,3 +15,7 @@ Route::get('/catalogs/{slug}', [CatalogController::class, 'show']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('addresses', AddressController::class);
+});
