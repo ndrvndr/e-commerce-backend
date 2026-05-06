@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Catalogs;
 
 use App\Filament\Resources\Catalogs\Pages\CreateCatalog;
+use App\Filament\Resources\Catalogs\Pages\ViewCatalog;
 use App\Filament\Resources\Catalogs\Pages\EditCatalog;
 use App\Filament\Resources\Catalogs\Pages\ListCatalogs;
 use App\Filament\Resources\Catalogs\Schemas\CatalogForm;
@@ -18,7 +19,7 @@ class CatalogResource extends Resource
 {
     protected static ?string $model = Catalog::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -44,6 +45,7 @@ class CatalogResource extends Resource
         return [
             'index' => ListCatalogs::route('/'),
             'create' => CreateCatalog::route('/create'),
+            'view' => ViewCatalog::route('/{record}'),
             'edit' => EditCatalog::route('/{record}/edit'),
         ];
     }

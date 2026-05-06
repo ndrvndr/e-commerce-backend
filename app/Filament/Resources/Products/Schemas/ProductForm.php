@@ -10,6 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Filament\Schemas\Components\Utilities\Set;
@@ -31,7 +32,8 @@ class ProductForm
                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
                 TextInput::make('slug')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true)
+                    ->columnSpanFull(),
                 RichEditor::make('description')
                     ->required()
                     ->columnSpanFull(),
@@ -49,9 +51,8 @@ class ProductForm
                     ->required()
                     ->numeric()
                     ->suffix('gram'),
-                Toggle::make('is_active')
-                    ->default(true)
-                    ->required(),
+                Hidden::make('is_active')
+                    ->default(true),
                 FileUpload::make('image_primary')
                     ->label('Gambar Utama')
                     ->required()
@@ -63,11 +64,13 @@ class ProductForm
                     ->image()
                     ->directory('products'),
                 FileUpload::make('size_chart_image')
+                    ->required()
                     ->label('Panduan Ukuran (Size Chart)')
                     ->image()
                     ->directory('products')
                     ->columnSpanFull(),
                 Repeater::make('color_images')
+                    ->required()
                     ->label('Daftar Warna & Foto')
                     ->schema([
                         TextInput::make('color')
@@ -85,6 +88,7 @@ class ProductForm
                     ->columns(2)
                     ->columnSpanFull(),
                 Repeater::make('variations')
+                    ->required()
                     ->relationship('variations')
                     ->schema([
                         Select::make('color')
