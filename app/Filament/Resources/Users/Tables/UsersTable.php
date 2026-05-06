@@ -1,38 +1,31 @@
 <?php
 
-namespace App\Filament\Resources\Products\Tables;
+namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
-class ProductsTable
+class UsersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                ImageColumn::make('image_primary')
-                    ->label('Image')
-                    ->circular(),
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('catalog.name')
-                    ->label('Catalog')
-                    ->sortable()
+                TextColumn::make('email')
+                    ->label('Email address')
                     ->searchable(),
-                TextColumn::make('price')
-                    ->money('IDR')
+                TextColumn::make('created_at')
+                    ->dateTime()
                     ->sortable(),
-                TextColumn::make('total_stock')
-                    ->label('Total Stock')
-                    ->getStateUsing(fn ($record) => $record->variations->sum('stock'))
-                    ->sortable()
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 //

@@ -15,9 +15,11 @@ class CatalogForm
         return $schema
             ->components([
                 FileUpload::make('image')
+                    ->required()
                     ->image()
                     ->directory('catalogs')
                     ->columnSpanFull(),
+
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('slug')
