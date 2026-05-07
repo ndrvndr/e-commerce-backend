@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Auth\SocialiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,4 +19,5 @@ Route::get('/products/{slug}', [ProductController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('addresses', AddressController::class);
+    Route::post('/logout', [SocialiteController::class, 'logout']);
 });
