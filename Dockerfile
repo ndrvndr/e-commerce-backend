@@ -12,6 +12,8 @@ RUN apk add --no-cache \
     libpq-dev \
     libzip-dev \
     icu-dev \
+    nodejs \
+    npm \
     && docker-php-ext-install pdo pdo_pgsql gd zip intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -20,7 +22,10 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --optimize-autoloader
+RUN composer install --optimize-autoloader --no-dev
+
+# Build Vite assets
+RUN npm ci && npm run build
 
 COPY nginx.conf /etc/nginx/http.d/default.conf
 
