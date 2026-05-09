@@ -10,6 +10,9 @@ php artisan route:cache
 echo "▶ Caching views..."
 php artisan view:cache
 
+echo "▶ Publishing Filament assets..."
+php artisan filament:assets
+
 echo "▶ Running migrations..."
 php artisan migrate --force
 
