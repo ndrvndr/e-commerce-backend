@@ -20,7 +20,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --optimize-autoloader --no-dev --no-interaction
+RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
 
 RUN npm ci && npm run build && rm -rf node_modules
 

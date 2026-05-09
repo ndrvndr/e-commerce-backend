@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+echo "▶ Discovering packages..."
+php artisan package:discover --ansi
+
 echo "▶ Clearing old cache..."
 php artisan config:clear
 php artisan cache:clear
