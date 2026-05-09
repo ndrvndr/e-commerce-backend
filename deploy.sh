@@ -1,5 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 set -e
+
+echo "▶ Clearing old cache..."
+php artisan config:clear
+php artisan cache:clear
 
 echo "▶ Caching config..."
 php artisan config:cache
@@ -10,14 +14,17 @@ php artisan route:cache
 echo "▶ Caching views..."
 php artisan view:cache
 
-echo "▶ Publishing Filament assets..."
-php artisan filament:assets
-
 echo "▶ Running migrations..."
 php artisan migrate --force
+
+echo "▶ Linking storage..."
+php artisan storage:link || true
+
+echo "▶ Publishing Filament assets..."
+php artisan filament:assets
 
 echo "▶ Starting PHP-FPM..."
 php-fpm -D
 
 echo "▶ Starting Nginx..."
-nginx -g "daemon off;"
+exec nginx -g "daemon off;"
