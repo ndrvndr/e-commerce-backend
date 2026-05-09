@@ -8,11 +8,13 @@ RUN apk add --no-cache \
     curl \
     zip \
     unzip \
+    nodejs-current \
+    npm \
     libpng-dev \
     libpq-dev \
     libzip-dev \
     icu-dev \
-    && docker-php-ext-install pdo pdo_pgsql gd zip intl
+    && docker-php-ext-install pdo pdo_pgsql gd zip intl opcache
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
