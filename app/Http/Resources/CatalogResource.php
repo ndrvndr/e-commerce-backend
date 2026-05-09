@@ -19,7 +19,7 @@ class CatalogResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'image' => $this->image ? asset('storage/' . $this->image) : null,
+            'image' => r2_url($this->image),
             'products' => ProductResource::collection($this->whenLoaded('products')),
         ];
     }
