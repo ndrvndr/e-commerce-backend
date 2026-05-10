@@ -54,31 +54,31 @@ class ProductForm
                 Hidden::make('is_active')
                     ->default(true),
                 FileUpload::make('image_primary')
-                    ->label('Gambar Utama')
+                    ->label('Main Image')
                     ->required()
                     ->image()
                     ->directory('products'),
                 FileUpload::make('image_hover')
-                    ->label('Gambar Saat Hover')
+                    ->label('Hover Image')
                     ->required()
                     ->image()
                     ->directory('products'),
                 FileUpload::make('size_chart_image')
                     ->required()
-                    ->label('Panduan Ukuran (Size Chart)')
+                    ->label('Size Chart')
                     ->image()
                     ->directory('products')
                     ->columnSpanFull(),
                 Repeater::make('color_images')
                     ->required()
-                    ->label('Daftar Warna & Foto')
+                    ->label('Color Images')
                     ->schema([
                         TextInput::make('color')
-                            ->label('Nama Warna (Contoh: Putih)')
+                            ->label('Color')
                             ->live(onBlur: true)
                             ->required(),
                         FileUpload::make('images')
-                            ->label('Foto Baju (Maks. 5)')
+                            ->label('Clothes Pictures (Max 5)')
                             ->image()
                             ->multiple()
                             ->maxFiles(5)
@@ -93,7 +93,7 @@ class ProductForm
                     ->schema([
                         Select::make('color')
                             ->required()
-                            ->label('Warna')
+                            ->label('Color')
                             ->options(function (\Filament\Schemas\Components\Utilities\Get $get) {
                                 $colors = $get('../../color_images');
                                 if (!is_array($colors)) return [];
@@ -107,9 +107,9 @@ class ProductForm
                             }),
                         TextInput::make('size')
                             ->required()
-                            ->label('Ukuran'),
+                            ->label('Size'),
                         TextInput::make('stock')
-                            ->label('Stok')
+                            ->label('Stock')
                             ->numeric()
                             ->default(0)
                             ->required(),
