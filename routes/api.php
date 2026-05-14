@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\CatalogController;
+use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -17,6 +18,8 @@ Route::get('/catalogs/{slug}', [CatalogController::class, 'show']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
+
+Route::get('/gallery', [GalleryController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
