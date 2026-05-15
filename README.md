@@ -17,6 +17,7 @@
 
 ## 📋 Table of Contents
 
+- [Live Demo](#-live-demo)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -35,6 +36,18 @@
 - [Admin Panel](#-admin-panel)
 - [File Storage](#-file-storage)
 - [Roles & Permissions](#-roles--permissions)
+
+---
+
+## 🌐 Live Demo
+
+| | |
+|---|---|
+| **Admin Panel** | [https://e-commerce-backend-6m2p.onrender.com/admin](https://e-commerce-backend-6m2p.onrender.com/admin) |
+| **Email** | `guest@guest.com` |
+| **Password** | `guest123` |
+
+> ⚠️ Hosted on Render's free tier — the server may take **~30 seconds** to wake up on the first visit.
 
 ---
 
