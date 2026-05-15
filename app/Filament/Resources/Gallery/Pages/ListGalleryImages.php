@@ -25,6 +25,7 @@ class ListGalleryImages extends ListRecords
             Action::make('upload')
                 ->label('Upload Images')
                 ->icon(Heroicon::OutlinedArrowUpTray)
+                ->authorize(fn () => auth()->user()->can('create_gallery_image'))
                 ->modalHeading('Upload Gallery Images')
                 ->modalDescription(function () {
                     $current = GalleryImage::count();
