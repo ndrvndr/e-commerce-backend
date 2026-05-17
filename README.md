@@ -36,6 +36,8 @@
 - [Admin Panel](#-admin-panel)
 - [File Storage](#-file-storage)
 - [Roles & Permissions](#-roles--permissions)
+- [Auth Mechanism](#-auth-mechanism)
+- [Deployment Scenarios](#-deployment-scenarios)
 
 ---
 
@@ -184,24 +186,106 @@ The `deploy.sh` entrypoint script automatically:
 
 ## 🔧 Environment Variables
 
-| Variable | Description | Example |
+Variables are grouped by concern. Copy `.env.example` to `.env` and fill in the required values.
+
+---
+
+### Application
+
+| Variable | Default | Description |
 |---|---|---|
-| `APP_URL` | Full URL of this backend | `https://api.example.com` |
-| `FRONTEND_URL` | URL of the frontend app | `https://example.com` |
-| `DB_CONNECTION` | Database driver | `pgsql` |
-| `DB_HOST` | Database host | `127.0.0.1` |
-| `DB_DATABASE` | Database name | `ecommerce` |
-| `DB_USERNAME` | Database user | `postgres` |
-| `DB_PASSWORD` | Database password | `secret` |
-| `AWS_ACCESS_KEY_ID` | S3 / R2 access key | — |
-| `AWS_SECRET_ACCESS_KEY` | S3 / R2 secret key | — |
-| `AWS_DEFAULT_REGION` | Region (`auto` for R2) | `auto` |
-| `AWS_BUCKET` | Bucket name | `my-bucket` |
-| `AWS_ENDPOINT` | Custom endpoint for R2 | `https://<id>.r2.cloudflarestorage.com` |
-| `AWS_URL` | Public URL for serving assets | `https://cdn.example.com` |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | — |
-| `GOOGLE_REDIRECT_URI` | OAuth callback URL | `https://api.example.com/auth/google/callback` |
+| `APP_NAME` | `Laravel` | Application name |
+| `APP_ENV` | `local` | Environment: `local`, `staging`, `production` |
+| `APP_KEY` | *(empty)* | Encryption key — generate with `php artisan key:generate` |
+| `APP_DEBUG` | `true` | Show detailed errors. **Always `false` in production** |
+| `APP_URL` | `http://localhost:8000` | Full public URL of this backend |
+
+---
+
+### Database
+
+| Variable | Description |
+|---|---|
+| `DB_CONNECTION` | Driver — use `pgsql` for PostgreSQL |
+| `DB_HOST` | Database host |
+| `DB_PORT` | Database port (`5432` for PostgreSQL) |
+| `DB_DATABASE` | Database name |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+
+> This project is configured for **PostgreSQL**. Managed services like [Neon](https://neon.tech) or [Supabase](https://supabase.com) work out of the box.
+
+---
+
+### Session
+
+| Variable | Default | Description |
+|---|---|---|
+| `SESSION_DRIVER` | `cookie` | Stores session in an encrypted cookie (no DB table needed) |
+| `SESSION_LIFETIME` | `120` | Session idle timeout in minutes |
+| `SESSION_SECURE_COOKIE` | `false` | Set to `true` in production (requires HTTPS) |
+| `SESSION_HTTP_ONLY` | `true` | Prevents JavaScript from accessing the session cookie |
+| `SESSION_SAME_SITE` | `Lax` | `Lax` for local/same-site · `None` for cross-domain (requires `SESSION_SECURE_COOKIE=true`) |
+
+---
+
+### File Storage — Cloudflare R2
+
+All media uploads use **Cloudflare R2** (S3-compatible). Get your credentials from the [Cloudflare Dashboard](https://dash.cloudflare.com) → R2 → Manage API Tokens.
+
+| Variable | Description |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | R2 Access Key ID |
+| `AWS_SECRET_ACCESS_KEY` | R2 Secret Access Key |
+| `AWS_DEFAULT_REGION` | Use `auto` for Cloudflare R2 |
+| `AWS_BUCKET` | Your R2 bucket name |
+| `AWS_USE_PATH_STYLE_ENDPOINT` | Must be `true` for R2 |
+| `AWS_ENDPOINT` | R2 S3 API endpoint: `https://<ACCOUNT_ID>.r2.cloudflarestorage.com` |
+| `AWS_URL` | Public URL for serving files (R2 public bucket URL or custom domain) |
+
+---
+
+### Google OAuth
+
+Create OAuth credentials at [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials → OAuth 2.0 Client IDs.
+
+| Variable | Description |
+|---|---|
+| `GOOGLE_CLIENT_ID` | OAuth 2.0 Client ID |
+| `GOOGLE_CLIENT_SECRET` | OAuth 2.0 Client Secret |
+| `GOOGLE_REDIRECT_URI` | Must exactly match what is registered in Google Cloud Console |
+
+---
+
+### Frontend & Cookie Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `FRONTEND_URL` | `http://localhost:3000` | Primary frontend origin (used for CORS and OAuth redirects) |
+| `FRONTEND_URLS` | *(unset)* | Comma-separated list for **multiple** frontend origins — overrides `FRONTEND_URL` |
+| `COOKIE_DOMAIN` | *(empty)* | Cookie domain scope. Leave empty for single domain. Set to `.yourdomain.com` to share across subdomains |
+| `COOKIE_SECURE` | `false` | Set to `true` in production (HTTPS). Required when `COOKIE_SAME_SITE=None` |
+| `COOKIE_SAME_SITE` | `Lax` | `Strict` · `Lax` · `None` (cross-domain requires `COOKIE_SECURE=true`) |
+
+---
+
+### Sanctum
+
+| Variable | Default | Description |
+|---|---|---|
+| `SANCTUM_TOKEN_EXPIRATION` | `10080` | Token lifetime in minutes (`10080` = 7 days) |
+| `SANCTUM_STATEFUL_DOMAINS` | `localhost:3000` | Comma-separated list of domains that receive Sanctum's stateful cookies. Add your frontend domain(s) in production |
+
+---
+
+### Admin Panel
+
+| Variable | Description |
+|---|---|
+| `ADMIN_EMAIL` | Email for the first seeded admin user |
+| `ADMIN_PASSWORD` | Password for the first seeded admin user |
+
+> These values are only used during `php artisan db:seed`. Change the password via the admin panel after first login.
 
 ---
 
@@ -325,10 +409,39 @@ Redirects the user to Google's OAuth consent screen.
 
 #### `GET /auth/google/callback`
 
-Handles the OAuth callback. Creates or retrieves the user, assigns the `guest` role on first login, issues a Sanctum token, and redirects to:
+Handles the OAuth callback. Creates or retrieves the user, assigns the `guest` role on first login, then generates a **one-time code** (valid for 60 seconds) and redirects to:
 
 ```
-{FRONTEND_URL}/authentication/callback?token=<sanctum_token>
+{FRONTEND_URL}/authentication/callback?code=<one_time_code>
+```
+
+> The Sanctum token is **never** exposed in the redirect URL. The frontend must exchange this code via `POST /api/auth/verify-code`.
+
+---
+
+#### `POST /api/auth/verify-code`
+
+Exchanges a one-time OAuth code for an authenticated session. On success, a Sanctum token is issued as an **HTTP-only, Secure cookie** (`auth_token`) — the token is never exposed in the response body.
+
+**Request Body**
+```json
+{ "code": "<one_time_code_from_callback_url>" }
+```
+
+**Response** `200 OK`
+```json
+{ "message": "OK" }
+```
+
+```
+Set-Cookie: auth_token=<token>; HttpOnly; Secure; SameSite=None; Path=/
+```
+
+> The browser automatically sends this cookie on every subsequent request. The `CookieToBearer` middleware converts it to a `Bearer` token transparently — no manual token handling needed on the frontend.
+
+**Error** `401 Unauthorized`
+```json
+{ "message": "Invalid or expired code" }
 ```
 
 ---
@@ -480,6 +593,98 @@ Assign the super admin role to a user:
 ```bash
 php artisan shield:super-admin --user=<email>
 ```
+
+---
+
+## 🔐 Auth Mechanism
+
+This project uses a **custom HTTP-only cookie + Sanctum token** approach, combining the security of HTTP-only cookies with the simplicity of token-based auth.
+
+### Flow
+
+```
+┌─────────────┐                          ┌──────────────┐              ┌────────────┐
+│   Frontend  │                          │    Backend   │              │   Google   │
+└──────┬──────┘                          └──────┬───────┘              └─────┬──────┘
+       │  GET /auth/google/redirect             │                            │
+       │ ──────────────────────────────────>   │                            │
+       │                                        │  redirect to Google OAuth  │
+       │                                        │ ────────────────────────> │
+       │                                        │  callback with auth code   │
+       │                                        │ <──────────────────────── │
+       │                                        │                            │
+       │  redirect ?code=<one_time_code>        │                            │
+       │ <──────────────────────────────────── │                            │
+       │                                        │                            │
+       │  POST /api/auth/verify-code            │                            │
+       │ ──────────────────────────────────>   │                            │
+       │                                        │  validate code             │
+       │  200 OK + Set-Cookie: auth_token=...   │  create Sanctum token      │
+       │ <──────────────────────────────────── │                            │
+       │                                        │                            │
+       │  GET /api/me (cookie sent auto)        │                            │
+       │ ──────────────────────────────────>   │  CookieToBearer middleware  │
+       │                                        │  injects Authorization header
+       │  200 OK { data: { user } }             │                            │
+       │ <──────────────────────────────────── │                            │
+```
+
+### Why HTTP-only Cookie?
+
+| Approach | XSS Risk | CSRF Risk | Notes |
+|---|---|---|---|
+| `localStorage` | ❌ High (JS-accessible) | ✅ None | Common but vulnerable to XSS |
+| Response body (memory) | ✅ None | ✅ None | Lost on page refresh |
+| **HTTP-only Cookie** | ✅ None (JS-blocked) | ⚠️ Mitigated by SameSite | Best balance of security & UX |
+
+The `CookieToBearer` middleware (`app/Http/Middleware/CookieToBearer.php`) transparently converts the `auth_token` cookie to a `Bearer` Authorization header on every request — the frontend needs **zero token management**.
+
+---
+
+## 🌍 Deployment Scenarios
+
+Configure these `.env` variables based on how your frontend and backend are deployed:
+
+### Same Domain
+> Frontend and backend on the exact same domain (e.g. `example.com` serving both)
+
+```env
+FRONTEND_URL=https://example.com
+COOKIE_DOMAIN=
+COOKIE_SECURE=true
+COOKIE_SAME_SITE=Strict
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=Strict
+```
+
+### Subdomain
+> Frontend and backend on different subdomains (e.g. `app.example.com` + `api.example.com`)
+
+```env
+FRONTEND_URL=https://app.example.com
+COOKIE_DOMAIN=.example.com
+COOKIE_SECURE=true
+COOKIE_SAME_SITE=Lax
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=Lax
+```
+
+> `COOKIE_DOMAIN` must start with a dot (`.example.com`) to share the cookie across all subdomains.
+
+### Cross-Domain
+> Frontend and backend on completely different domains (e.g. `frontend.com` + `api.backend.com`)
+
+```env
+FRONTEND_URL=https://frontend.com
+# FRONTEND_URLS=https://frontend.com,https://admin.frontend.com  # for multiple origins
+COOKIE_DOMAIN=
+COOKIE_SECURE=true
+COOKIE_SAME_SITE=None
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=None
+```
+
+> `SameSite=None` **requires** `Secure=true`. The browser will reject insecure `SameSite=None` cookies.
 
 ---
 
