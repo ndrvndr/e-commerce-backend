@@ -7,7 +7,6 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Shield Resource
@@ -19,15 +18,15 @@ return [
     |
     */
 
-    'shield_resource' => [
-        'slug' => 'shield/roles',
-        'show_model_path' => true,
-        'cluster' => null,
-        'tabs' => [
-            'pages' => true,
-            'widgets' => true,
-            'resources' => true,
-            'custom_permissions' => false,
+    "shield_resource" => [
+        "slug" => "shield/roles",
+        "show_model_path" => true,
+        "cluster" => null,
+        "tabs" => [
+            "pages" => true,
+            "widgets" => true,
+            "resources" => true,
+            "custom_permissions" => false,
         ],
     ],
 
@@ -42,7 +41,7 @@ return [
     |
     */
 
-    'tenant_model' => null,
+    "tenant_model" => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +54,7 @@ return [
     |
     */
 
-    'auth_provider_model' => 'App\\Models\\User',
+    "auth_provider_model" => "App\\Models\\User",
 
     /*
     |--------------------------------------------------------------------------
@@ -68,11 +67,11 @@ return [
     |
     */
 
-    'super_admin' => [
-        'enabled' => true,
-        'name' => 'super_admin',
-        'define_via_gate' => false,
-        'intercept_gate' => 'before',
+    "super_admin" => [
+        "enabled" => true,
+        "name" => "super_admin",
+        "define_via_gate" => true,
+        "intercept_gate" => "before",
     ],
 
     /*
@@ -86,9 +85,9 @@ return [
     |
     */
 
-    'panel_user' => [
-        'enabled' => true,
-        'name' => 'panel_user',
+    "panel_user" => [
+        "enabled" => true,
+        "name" => "panel_user",
     ],
 
     /*
@@ -104,10 +103,10 @@ return [
     |
     */
 
-    'permissions' => [
-        'separator' => ':',
-        'case' => 'pascal',
-        'generate' => true,
+    "permissions" => [
+        "separator" => ":",
+        "case" => "pascal",
+        "generate" => true,
     ],
 
     /*
@@ -121,21 +120,31 @@ return [
     |
     */
 
-    'policies' => [
-        'path' => app_path('Policies'),
-        'merge' => true,
-        'generate' => true,
-        'methods' => [
-            'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny', 'restore',
-            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+    "policies" => [
+        "path" => app_path("Policies"),
+        "merge" => true,
+        "generate" => true,
+        "methods" => [
+            "viewAny",
+            "view",
+            "create",
+            "update",
+            "delete",
+            "deleteAny",
+            "restore",
+            "forceDelete",
+            "forceDeleteAny",
+            "restoreAny",
+            "replicate",
+            "reorder",
         ],
-        'single_parameter_methods' => [
-            'viewAny',
-            'create',
-            'deleteAny',
-            'forceDeleteAny',
-            'restoreAny',
-            'reorder',
+        "single_parameter_methods" => [
+            "viewAny",
+            "create",
+            "deleteAny",
+            "forceDeleteAny",
+            "restoreAny",
+            "reorder",
         ],
     ],
 
@@ -150,9 +159,10 @@ return [
     |
     */
 
-    'localization' => [
-        'enabled' => false,
-        'key' => 'filament-shield::filament-shield.resource_permission_prefixes_labels',
+    "localization" => [
+        "enabled" => false,
+        "key" =>
+            "filament-shield::filament-shield.resource_permission_prefixes_labels",
     ],
 
     /*
@@ -166,18 +176,18 @@ return [
     |
     */
 
-    'resources' => [
-        'subject' => 'model',
-        'manage' => [
+    "resources" => [
+        "subject" => "model",
+        "manage" => [
             RoleResource::class => [
-                'viewAny',
-                'view',
-                'create',
-                'update',
-                'delete',
+                "viewAny",
+                "view",
+                "create",
+                "update",
+                "delete",
             ],
         ],
-        'exclude' => [
+        "exclude" => [
             //
         ],
     ],
@@ -193,12 +203,10 @@ return [
     |
     */
 
-    'pages' => [
-        'subject' => 'class',
-        'prefix' => 'view',
-        'exclude' => [
-            Dashboard::class,
-        ],
+    "pages" => [
+        "subject" => "class",
+        "prefix" => "view",
+        "exclude" => [Dashboard::class],
     ],
 
     /*
@@ -212,13 +220,10 @@ return [
     |
     */
 
-    'widgets' => [
-        'subject' => 'class',
-        'prefix' => 'view',
-        'exclude' => [
-            AccountWidget::class,
-            FilamentInfoWidget::class,
-        ],
+    "widgets" => [
+        "subject" => "class",
+        "prefix" => "view",
+        "exclude" => [AccountWidget::class, FilamentInfoWidget::class],
     ],
 
     /*
@@ -232,7 +237,7 @@ return [
     |
     */
 
-    'custom_permissions' => [],
+    "custom_permissions" => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -245,10 +250,10 @@ return [
     |
     */
 
-    'discovery' => [
-        'discover_all_resources' => false,
-        'discover_all_widgets' => false,
-        'discover_all_pages' => false,
+    "discovery" => [
+        "discover_all_resources" => false,
+        "discover_all_widgets" => false,
+        "discover_all_pages" => false,
     ],
 
     /*
@@ -262,6 +267,5 @@ return [
     |
     */
 
-    'register_role_policy' => true,
-
+    "register_role_policy" => true,
 ];
