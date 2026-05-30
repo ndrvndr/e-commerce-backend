@@ -16,7 +16,7 @@ php artisan package:discover --ansi
 
 echo "▶ Clearing old cache..."
 php artisan config:clear
-php artisan cache:clear
+php artisan cache:clear || true
 
 echo "▶ Caching config..."
 php artisan config:cache
